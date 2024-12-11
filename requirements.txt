@@ -3,7 +3,6 @@ certifi==2024.8.30
 dj-database-url==2.3.0
 Django==5.1.4
 django-environ==0.11.2
-psycopg2==2.9.10
 psycopg2-binary==2.9.10
 sqlparse==0.5.2
 typing_extensions==4.12.2
