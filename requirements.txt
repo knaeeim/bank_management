@@ -3,7 +3,6 @@ certifi
 dj-database-url
 Django
 django-environ
-psycopg2
 psycopg2-binary
 sqlparse
 typing_extensions
