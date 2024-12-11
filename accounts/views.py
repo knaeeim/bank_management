@@ -1,16 +1,21 @@
 from django.shortcuts import render, redirect
 from django.views.generic import FormView
 from django.views import View
+from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
-from .forms import UserRegistrationForm, UserUpdateForm
+from .forms import UserRegistrationForm, UserUpdateForm, PasswordChangeForm
 from django.contrib.auth import login, logout
 from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from transactions.views import send_transaction_email
+from django.contrib import messages
+
 
 # Create your views here.
 class UserRegistrationView(FormView):
     template_name = 'accounts/user_registration.html'
     form_class = UserRegistrationForm
-    success_url = reverse_lazy('profile')
+    success_url = reverse_lazy('profile_update')
 
     def form_valid(self, form):
         print(form.cleaned_data)
@@ -30,7 +35,7 @@ def user_logout(request):
     return redirect('login')
 
 
-class UserUpdateView(View):
+class UserUpdateView(LoginRequiredMixin, View):
     template_name = 'accounts/profile.html'
 
     def get(self, request):
@@ -52,3 +57,20 @@ class UserUpdateView(View):
         form.save()
         return super().form_valid(form)
 
+class ChangePassword(LoginRequiredMixin, View):
+    template_name = 'accounts/change_pass.html'
+    model = User
+    form_class = PasswordChangeForm
+
+    def get(self, request):
+        form = self.form_class(user = request.user)
+        return render(request, self.template_name, {'form' : form})
+    
+    def post(self, request):
+        form = self.form_class(user = request.user, data = request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Password has been successfully changed')
+            send_transaction_email(request.user, 0, 'Password Change Confirmation', 'accounts/password_email.html')
+            return redirect('profile_update')
+        return render(request, self.template_name, {'form' : form})

@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django import forms
 from .constants import *
 from django.contrib.auth.models import User
@@ -128,5 +128,9 @@ class UserUpdateForm(forms.ModelForm):
         return user
     
 
-
+class PasswordChangeForm(PasswordChangeForm):
+    class Meta:
+        model = User
+        fields = ['old_password', 'new_password1', 'new_password2']
+        
 

@@ -216,6 +216,9 @@ class TransferMoneyView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             messages.success(request, 'Money has been successfully transferred')
+            receiver_account = form.receiver_account
+            send_transaction_email(request.user, form.cleaned_data['amount'], "Transfer Confirmation", 'transfer_email.html')
+            send_transaction_email(receiver_account.user, form.cleaned_data['amount'], "Transfer Confirmation", 'transfer_email.html')
             return redirect('report')
         return render(request, self.template_name, {'form' : form, 'title' : self.title})
 
